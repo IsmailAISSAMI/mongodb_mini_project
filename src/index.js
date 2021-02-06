@@ -23,16 +23,30 @@ hbs.registerPartials(partialsDir)
 
 app.get('', async (req,res)=>{
     await Promise.all([getCountries(), getCovidData()])
-    res.render('home')
+    return res.render('home')
 })
 
 app.get('/country', async(req, res) => {
-    searchCountryData(req.query.CountryName).then((result)=>{
-        res.render('country', {result})
-    }).catch((error)=>{
-        res.render('error', {error})
-    })
-    
+    try{
+        var result = await searchCountryData(req.query.CountryName)
+        if(result.length == 0){
+            return res.render('error', {"error": "The country that you search doesn't exist!"})
+        }
+        result = result[0]
+        return res.render('country', {
+            country: result.country,
+            cases:result.cases,
+            todayCases:result.todayCases,
+            deaths:result.deaths,
+            todayDeaths:result.todayDeaths,
+            recovered:result.recovered,
+            todayRecovered:result.todayRecovered,
+            active:result.active,
+            critical:result.critical,
+        })
+    } catch(error){
+        return res.render('error', {error})
+    }  
 })
 
 app.listen(port, ()=>{
