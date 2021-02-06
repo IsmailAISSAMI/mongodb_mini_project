@@ -6,6 +6,16 @@
 </head>
 <body>
     {{>navbar}}
-    <h1>Welcome to the home page!</h1>
+    <div class="container">
+        <h1>Welcome to the home page!</h1>
+
+        <form action="/country" method="get" target="_blank">
+            <label for="CountryName">Country name:</label>
+            <input type="text" id="CountryName" name="CountryName"><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    
+    
 </body>
 </html>

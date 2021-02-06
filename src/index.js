@@ -1,7 +1,11 @@
 const path = require('path')
 const express = require('express')
 const hbs = require('hbs')
-const countriesData = require('./utils/countriesData')
+const getCountries = require('./utils/getCountries')
+const getCovidData = require('./utils/getCovidData')
+const searchCountryData = require('./utils/searchCountryData')
+
+
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -17,12 +21,18 @@ app.set('view engine', 'hbs')
 
 hbs.registerPartials(partialsDir)
 
-app.get('', (req,res)=>{
+app.get('', async (req,res)=>{
+    await Promise.all([getCountries(), getCovidData()])
     res.render('home')
 })
 
-app.get('/worldwide', async(req, res) => {
-    await countriesData()
+app.get('/country', async(req, res) => {
+    searchCountryData(req.query.CountryName).then((result)=>{
+        res.render('country', {result})
+    }).catch((error)=>{
+        res.render('error', {error})
+    })
+    
 })
 
 app.listen(port, ()=>{
