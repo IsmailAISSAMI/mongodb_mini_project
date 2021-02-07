@@ -7,7 +7,7 @@ const searchCountryData = require('./utils/searchCountryData')
 const searchCountryGeo = require('./utils/searchCountryGeo')
 const getWorldwide = require('./utils/getWorldwide')
 const searchWorldwide = require('./utils/searchWorldwide')
-
+const sortCountriesInfection = require('./utils/sortCountriesInfection')
 
 
 const app = express()
@@ -85,6 +85,28 @@ app.get('/worldwide', async (req,res)=>{
     } catch(error){
         return res.render('error', {error})
     } 
+})
+
+// The most infected countries with covid
+app.get('/rank', async (req, res)=> {
+    try{
+        const result = await sortCountriesInfection()
+        return res.render('rank', {
+            'r0': result[0],
+            'r1': result[1],
+            'r2': result[2],
+            'r3': result[3],
+            'r4': result[4],
+            'r5': result[5],
+            'r6': result[6],
+            'r7': result[7],
+            'r8': result[8],
+            'r9': result[9],
+        })
+    } catch(error){
+        return res.render('error', {error})
+    }
+    
 })
 
 // Start server at port 3000 locally
