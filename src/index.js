@@ -5,6 +5,8 @@ const getCountries = require('./utils/getCountries')
 const getCovidData = require('./utils/getCovidData')
 const searchCountryData = require('./utils/searchCountryData')
 const searchCountryGeo = require('./utils/searchCountryGeo')
+const getWorldwide = require('./utils/getWorldwide')
+const searchWorldwide = require('./utils/searchWorldwide')
 
 
 
@@ -22,11 +24,13 @@ app.set('view engine', 'hbs')
 
 hbs.registerPartials(partialsDir)
 
+// Set countries geo, and covid data (in the world and by countries) then return Home page 
 app.get('', async (req,res)=>{
-    await Promise.all([getCountries(), getCovidData()])
+    await Promise.all([getCountries(), getCovidData(), getWorldwide()])
     return res.render('home')
 })
 
+// Search by coutry name form
 app.get('/country', async(req, res) => {
     try{
         var result = await searchCountryData(req.query.CountryName)
@@ -54,6 +58,36 @@ app.get('/country', async(req, res) => {
     }  
 })
 
+// Return Worldwide data 
+app.get('/worldwide', async (req,res)=>{
+    try{
+        var result = await searchWorldwide()
+        console.log('>>>>worldwide result ', result)
+        // if(!result["cases"]){
+        //     return res.render('error', {"error": "The country that you search doesn't exist!"})
+        // }
+        return res.render('worldwide', {
+            cases: result.cases,
+            todayCases:result.todayCases,
+            deaths: result.deaths,
+            todayDeaths:result.todayCases,
+            recovered: result.recovered,
+            todayRecovered:result.todayRecovered,
+            active: result.active,
+            critical: result.critical,
+            casesPerOneMillion:result.casesPerOneMillion,
+            deathsPerOneMillion:result.deathsPerOneMillion,
+            activePerOneMillion:result.activePerOneMillion,
+            recoveredPerOneMillion:result.recoveredPerOneMillion,
+            criticalPerOneMillion:result.criticalPerOneMillion,
+        
+        })
+    } catch(error){
+        return res.render('error', {error})
+    } 
+})
+
+// Start server at port 3000 locally
 app.listen(port, ()=>{
     console.log(">> Server is up at the port " + port)
 })
