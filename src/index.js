@@ -4,6 +4,7 @@ const hbs = require('hbs')
 const getCountries = require('./utils/getCountries')
 const getCovidData = require('./utils/getCovidData')
 const searchCountryData = require('./utils/searchCountryData')
+const searchCountryGeo = require('./utils/searchCountryGeo')
 
 
 
@@ -29,9 +30,11 @@ app.get('', async (req,res)=>{
 app.get('/country', async(req, res) => {
     try{
         var result = await searchCountryData(req.query.CountryName)
-        if(result.length == 0){
+        var geo = await searchCountryGeo(req.query.CountryName)
+        if(result.length == 0 || geo.length == 0){
             return res.render('error', {"error": "The country that you search doesn't exist!"})
         }
+
         result = result[0]
         return res.render('country', {
             country: result.country,
@@ -43,6 +46,8 @@ app.get('/country', async(req, res) => {
             todayRecovered:result.todayRecovered,
             active:result.active,
             critical:result.critical,
+            lat: geo[0],
+            lng: geo[1]
         })
     } catch(error){
         return res.render('error', {error})
